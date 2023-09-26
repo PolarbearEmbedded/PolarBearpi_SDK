@@ -11,7 +11,10 @@ USE to PolarBear Pi
 
 #command:
 apt-get -y install git
-git clone https://github.com/PolarbearEmbedded/PolarBearpi_SDK.git PolarBearpi_SDK
+
+git clone https://github.com/PolarbearEmbedded/PolarBearpi_SDK
+
 cd PolarBearpi_SDK
+
 ./compile.sh
 
