@@ -1,0 +1,258 @@
+diff -Naur a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+--- a/arch/arm/dts/Makefile	2023-09-25 20:35:45.415849258 +0800
++++ b/arch/arm/dts/Makefile	2023-09-25 20:48:50.489100037 +0800
+@@ -667,6 +667,7 @@
+ 	sun8i-h3-orangepi-plus.dtb \
+ 	sun8i-h3-orangepi-plus2e.dtb \
+ 	sun8i-h3-orangepi-zero-plus2.dtb \
++	sun8i-h3-polarbearpi.dtb \
+ 	sun8i-h3-rervision-dvk.dtb \
+ 	sun8i-h3-zeropi.dtb
+ dtb-$(CONFIG_MACH_SUN8I_R40) += \
+diff -Naur a/arch/arm/dts/sun8i-h3-polarbearpi.dts b/arch/arm/dts/sun8i-h3-polarbearpi.dts
+--- a/arch/arm/dts/sun8i-h3-polarbearpi.dts	1970-01-01 08:00:00.000000000 +0800
++++ b/arch/arm/dts/sun8i-h3-polarbearpi.dts	2023-09-25 20:49:41.199318230 +0800
+@@ -0,0 +1,102 @@
++/*
++ * This file is dual-licensed: you can use it either under the terms
++ * of the GPL or the X11 license, at your option. Note that this dual
++ * licensing only applies to this file, and not this project as a
++ * whole.
++ *
++ *  a) This file is free software; you can redistribute it and/or
++ *     modify it under the terms of the GNU General Public License as
++ *     published by the Free Software Foundation; either version 2 of the
++ *     License, or (at your option) any later version.
++ *
++ *     This file is distributed in the hope that it will be useful,
++ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *     GNU General Public License for more details.
++ *
++ * Or, alternatively,
++ *
++ *  b) Permission is hereby granted, free of charge, to any person
++ *     obtaining a copy of this software and associated documentation
++ *     files (the "Software"), to deal in the Software without
++ *     restriction, including without limitation the rights to use,
++ *     copy, modify, merge, publish, distribute, sublicense, and/or
++ *     sell copies of the Software, and to permit persons to whom the
++ *     Software is furnished to do so, subject to the following
++ *     conditions:
++ *
++ *     The above copyright notice and this permission notice shall be
++ *     included in all copies or substantial portions of the Software.
++ *
++ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ *     OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++#include "sun8i-h3-polarbearpi.dtsi"
++
++/ {
++	model = "PolarBear PolarBearPi";
++	compatible = "polarbear,polarbearpi", "allwinner,sun8i-h3";
++
++	reg_gmac_3v3: gmac-3v3 {
++		compatible = "regulator-fixed";
++		pinctrl-names = "default";
++		pinctrl-0 = <&gmac_power_pin_polarbearpi>;
++		regulator-name = "gmac-3v3";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		startup-delay-us = <100000>;
++		enable-active-high;
++		gpio = <&pio 3 6 GPIO_ACTIVE_HIGH>;
++	};
++};
++
++&ehci0 {
++	status = "okay";
++};
++
++&ohci0 {
++	status = "okay";
++};
++
++&pio {
++	gmac_power_pin_polarbearpi: gmac_power_pin@0 {
++		pins = "PD6";
++		function = "gpio_out";
++	};
++};
++
++&external_mdio {
++	ext_rgmii_phy: ethernet-phy@1 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <7>;
++	};
++};
++
++&emac {
++	pinctrl-names = "default";
++	pinctrl-0 = <&emac_rgmii_pins>;
++	phy-supply = <&reg_gmac_3v3>;
++	phy-handle = <&ext_rgmii_phy>;
++	phy-mode = "rgmii";
++
++	allwinner,leds-active-low;
++	status = "okay";
++};
++
++&usb_otg {
++	status = "okay";
++	dr_mode = "peripheral";
++};
++
++&usbphy {
++	usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
++};
++
++
+diff -Naur a/arch/arm/dts/sun8i-h3-polarbearpi.dtsi b/arch/arm/dts/sun8i-h3-polarbearpi.dtsi
+--- a/arch/arm/dts/sun8i-h3-polarbearpi.dtsi	1970-01-01 08:00:00.000000000 +0800
++++ b/arch/arm/dts/sun8i-h3-polarbearpi.dtsi	2023-09-25 20:37:35.642233594 +0800
+@@ -0,0 +1,112 @@
++/*
++ * Copyright (C) 2016 James Pettigrew <james@innovum.com.au>
++ * Copyright (C) 2016 Milo Kim <woogyom.kim@gmail.com>
++ *
++ * This file is dual-licensed: you can use it either under the terms
++ * of the GPL or the X11 license, at your option. Note that this dual
++ * licensing only applies to this file, and not this project as a
++ * whole.
++ *
++ *  a) This file is free software; you can redistribute it and/or
++ *     modify it under the terms of the GNU General Public License as
++ *     published by the Free Software Foundation; either version 2 of the
++ *     License, or (at your option) any later version.
++ *
++ *     This file is distributed in the hope that it will be useful,
++ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *     GNU General Public License for more details.
++ *
++ * Or, alternatively,
++ *
++ *  b) Permission is hereby granted, free of charge, to any person
++ *     obtaining a copy of this software and associated documentation
++ *     files (the "Software"), to deal in the Software without
++ *     restriction, including without limitation the rights to use,
++ *     copy, modify, merge, publish, distribute, sublicense, and/or
++ *     sell copies of the Software, and to permit persons to whom the
++ *     Software is furnished to do so, subject to the following
++ *     conditions:
++ *
++ *     The above copyright notice and this permission notice shall be
++ *     included in all copies or substantial portions of the Software.
++ *
++ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ *     OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++/dts-v1/;
++#include "sun8i-h3.dtsi"
++#include "sunxi-common-regulators.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	aliases {
++		serial0 = &uart0;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led-0 {
++			label = "polarbearpi:blue:status";
++			gpios = <&pio 0 10 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "heartbeat";
++		};
++
++		led-1 {
++			label = "polarbearpi:green:pwr";
++			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++	};
++
++	r_gpio_keys {
++		compatible = "gpio-keys";
++		input-name = "k1";
++
++		k1 {
++			label = "k1";
++			linux,code = <KEY_POWER>;
++			gpios = <&r_pio 0 3 GPIO_ACTIVE_LOW>;
++			wakeup-source;
++		};
++	};
++};
++
++&ehci3 {
++	status = "okay";
++};
++
++&mmc0 {
++	bus-width = <4>;
++	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;
++	status = "okay";
++	vmmc-supply = <&reg_vcc3v3>;
++};
++
++&ohci3 {
++	status = "okay";
++};
++
++&uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart0_pa_pins>;
++	status = "okay";
++};
++
++&usbphy {
++	status = "okay";
++};
+diff -Naur a/configs/polarbearpi_defconfig b/configs/polarbearpi_defconfig
+--- a/configs/polarbearpi_defconfig	1970-01-01 08:00:00.000000000 +0800
++++ b/configs/polarbearpi_defconfig	2023-09-25 20:50:56.185620775 +0800
+@@ -0,0 +1,21 @@
++CONFIG_ARM=y
++CONFIG_ARCH_SUNXI=y
++CONFIG_MACH_SUN8I_H3=y
++CONFIG_DRAM_CLK=408
++CONFIG_DRAM_ZQ=3881979
++CONFIG_DRAM_ODT_EN=y
++CONFIG_MACPWR="PD6"
++# CONFIG_VIDEO_DE2 is not set
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_DEFAULT_DEVICE_TREE="sun8i-h3-polarbearpi"
++# CONFIG_SYS_MALLOC_CLEAR_ON_INIT is not set
++CONFIG_CONSOLE_MUX=y
++CONFIG_SPL=y
++CONFIG_SYS_CLK_FREQ=480000000
++# CONFIG_CMD_IMLS is not set
++# CONFIG_CMD_FLASH is not set
++# CONFIG_CMD_FPGA is not set
++CONFIG_SUN8I_EMAC=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE=y
